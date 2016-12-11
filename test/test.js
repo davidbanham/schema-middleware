@@ -6,6 +6,15 @@ const Middleware = require('../index');
 describe('middleware', () => {
   let middleware;
 
+  const valid = {
+    name: 'Jim',
+    email: 'jim@example.com'
+  };
+
+  const invalid = {
+    email: 'jim@example.com'
+  };
+
   before(async () => {
     const routeSchemas = {};
     const old = process.cwd();
@@ -23,29 +32,31 @@ describe('middleware', () => {
   });
 
   it('should validate a valid body', (done) => {
-    const body = {
-      name: 'Jim',
-      email: 'jim@example.com'
-    };
-
     middleware({
-      body,
+      body: valid,
       path: '/users',
       method: 'POST',
     }, null, done);
   });
 
   it('should reject an invalid body', (done) => {
-    const body = {
-      email: 'jim@example.com'
-    };
-
     middleware({
-      body,
+      body: invalid,
       path: '/users',
       method: 'POST',
     }, null, err => {
       assert(err.message === 'Missing required property: name');
+      done();
+    });
+  });
+
+  it('should fail gracefully on an unschemaed route', (done) => {
+    middleware({
+      body: valid,
+      path: '/nope',
+      method: 'POST',
+    }, null, err => {
+      assert(err.message === 'Route has no schema');
       done();
     });
   });
