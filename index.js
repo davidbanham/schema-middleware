@@ -1,10 +1,9 @@
 const tv4 = require('tv4');
 
-module.exports = (schema) => {
+module.exports = (routeSchemas) => {
  return (req, res, next) => {
-   const path = req.path;
-   const target = schema.routeSchemas[path];
-   const valid = tv4.validate(req.body, target;
-   valid ? next() : tv4.error;
+   const target = routeSchemas[req.method][req.path];
+   const valid = tv4.validate(req.body, target);
+   return valid ? next() : next(tv4.error);
  };
 };

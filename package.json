@@ -1,0 +1,36 @@
+{
+  "name": "schema-middleware",
+  "version": "1.0.0",
+  "description": "A middleware for validating incoming bodies against a json hyperschema",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/davidbanham/schema-middleware.git"
+  },
+  "keywords": [
+    "json",
+    "hyperschema",
+    "express",
+    "middleware",
+    "schema"
+  ],
+  "author": "david@banham.id.au",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/davidbanham/schema-middleware/issues"
+  },
+  "homepage": "https://gitlab.com/davidbanham/schema-middleware#README",
+  "devDependencies": {
+    "mocha": "^3.2.0"
+  },
+  "dependencies": {
+    "json-schema-ref-parser": "^3.1.2",
+    "tv4": "^1.2.7"
+  }
+}

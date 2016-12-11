@@ -1,0 +1,134 @@
+{
+  "id": "/user",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "User",
+  "description": "A buyer/seller entity",
+  "type": "object",
+  "definitions": {
+    "identifier": {
+      "$ref": "./types.json#/definitions/uuid",
+      "description": "User's UUID",
+      "example": "5776efe1-65b0-4c05-816b-36070165b626"
+    },
+    "created_at": {
+      "$ref": "./types.json#/definitions/timestamp",
+      "description": "The time at which the User was created"
+    },
+    "updated_at": {
+      "$ref": "./types.json#/definitions/timestamp",
+      "description": "The time at which the User was last updated"
+    },
+    "name": {
+      "type": "string",
+      "description": "The user's name.",
+      "example": "Jimbo Jones"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "The email address for this User",
+      "example": "jimbo@example.com"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "email"
+  ],
+  "properties": {
+    "id": {"$ref": "#/definitions/identifier"},
+    "created_at": {"$ref": "#/definitions/created_at"},
+    "updated_at": {"$ref": "#/definitions/updated_at"},
+    "name": {"$ref": "#/definitions/name"},
+    "email": {"$ref": "#/definitions/email"}
+  },
+  "links": [
+    {
+      "title": "All users",
+      "description": "Get all users of the system",
+      "rel": "instances",
+      "href": "/users",
+      "method": "GET",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": "integer",
+            "description": "Current page of users",
+            "example": 1,
+            "default": 1
+          },
+          "per_page": {
+            "type": "integer",
+            "description": "How many users to retrieve at once",
+            "min": 1,
+            "max": 200,
+            "default": 20
+          },
+          "order": {
+            "enum": ["id", "created_at", "updated_at"],
+            "description": "Attribute to order the results by",
+            "example": "id"
+          }
+        }
+      },
+      "targetSchema": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {"rel": "self"}
+          }
+        }
+      }
+    },{
+      "title": "User info",
+      "description": "Get a single user",
+      "rel": "self",
+      "href": "/users/{#/definitions/identifier}",
+      "routeShorthand": "/users/:id",
+      "method": "GET",
+      "targetSchema": {"rel": "self"}
+    },{
+      "title": "Create user",
+      "description": "Create a new User",
+      "rel": "self",
+      "href": "/users",
+      "method": "POST",
+      "targetSchema": {"rel": "self"},
+      "schema": {
+        "type": "object",
+        "required": [
+          "name",
+          "email"
+        ],
+        "properties": {
+          "id": {"$ref": "#/definitions/identifier"},
+          "name": {"$ref": "#/definitions/name"},
+          "email": {"$ref": "#/definitions/email"}
+        }
+      }
+    },{
+      "title": "Update user",
+      "description": "Update a User",
+      "rel": "self",
+      "href": "/users/{#/definitions/identifier}",
+      "routeShorthand": "/users/:id",
+      "method": "PUT",
+      "targetSchema": {"rel": "self"},
+      "schema": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "email"
+        ],
+        "properties": {
+          "id": {"$ref": "#/definitions/identifier"},
+          "name": {"$ref": "#/definitions/name"},
+          "email": {"$ref": "#/definitions/email"}
+        }
+      }
+    }
+  ]
+}
