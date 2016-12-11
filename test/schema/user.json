@@ -2,7 +2,7 @@
   "id": "/user",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "title": "User",
-  "description": "A buyer/seller entity",
+  "description": "A user",
   "type": "object",
   "definitions": {
     "identifier": {
