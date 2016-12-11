@@ -7,6 +7,7 @@ describe('middleware', () => {
   let middleware;
 
   const valid = {
+    id: '3640c173-5821-4112-b61c-77c8091c8346',
     name: 'Jim',
     email: 'jim@example.com'
   };
@@ -25,7 +26,7 @@ describe('middleware', () => {
     for (link of schema.links) {
       if (!link.schema) continue;
       routeSchemas[link.method] ? null : routeSchemas[link.method] = {};
-      routeSchemas[link.method][link.href] = link.schema;
+      routeSchemas[link.method][link.expressRoute || link.href] = link.schema;
     };
 
     middleware = require('../index')(routeSchemas);
@@ -36,6 +37,10 @@ describe('middleware', () => {
       body: valid,
       path: '/users',
       method: 'POST',
+      baseUrl: '/users',
+      route: {
+        path: ''
+      }
     }, null, done);
   });
 
@@ -44,6 +49,10 @@ describe('middleware', () => {
       body: invalid,
       path: '/users',
       method: 'POST',
+      baseUrl: '/users',
+      route: {
+        path: ''
+      }
     }, null, err => {
       assert(err.message === 'Missing required property: name');
       done();
@@ -55,9 +64,36 @@ describe('middleware', () => {
       body: valid,
       path: '/nope',
       method: 'POST',
+      baseUrl: '/nope',
+      route: {
+        path: ''
+      }
     }, null, err => {
       assert(err.message === 'Route has no schema');
       done();
     });
+  });
+
+  it('should ignore GETs', (done) => {
+    middleware({
+      path: '/users',
+      method: 'GET',
+      baseUrl: '/users',
+      route: {
+        path: ''
+      }
+    }, null, done);
+  });
+
+  it('should handle interpolated routes', (done) => {
+    middleware({
+      body: valid,
+      path: '/users/3640c173-5821-4112-b61c-77c8091c8346',
+      method: 'PUT',
+      baseUrl: '/users/',
+      route: {
+        path: ':id'
+      }
+    }, null, done);
   });
 });

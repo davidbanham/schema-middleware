@@ -86,7 +86,7 @@
       "description": "Get a single user",
       "rel": "self",
       "href": "/users/{#/definitions/identifier}",
-      "routeShorthand": "/users/:id",
+      "expressRoute": "/users/:id",
       "method": "GET",
       "targetSchema": {"rel": "self"}
     },{
@@ -113,7 +113,7 @@
       "description": "Update a User",
       "rel": "self",
       "href": "/users/{#/definitions/identifier}",
-      "routeShorthand": "/users/:id",
+      "expressRoute": "/users/:id",
       "method": "PUT",
       "targetSchema": {"rel": "self"},
       "schema": {
