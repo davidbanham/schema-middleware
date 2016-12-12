@@ -2,19 +2,24 @@ const assert = require('assert');
 const schema = require('./schema/user');
 const refparser = require('json-schema-ref-parser');
 const Middleware = require('../index');
+const express = require('express');
+const doubleagent = require('doubleagent');
+
+const app = express();
+const doubleApp = doubleagent(app);
+
+const valid = {
+  id: '3640c173-5821-4112-b61c-77c8091c8346',
+  name: 'Jim',
+  email: 'jim@example.com'
+};
+
+const invalid = {
+  email: 'jim@example.com'
+};
 
 describe('middleware', () => {
   let middleware;
-
-  const valid = {
-    id: '3640c173-5821-4112-b61c-77c8091c8346',
-    name: 'Jim',
-    email: 'jim@example.com'
-  };
-
-  const invalid = {
-    email: 'jim@example.com'
-  };
 
   before(async () => {
     const routeSchemas = {};
@@ -29,7 +34,7 @@ describe('middleware', () => {
       routeSchemas[link.method][link.expressRoute || link.href] = link.schema;
     };
 
-    middleware = require('../index')(routeSchemas);
+    middleware = Middleware.middleware(routeSchemas);
   });
 
   it('should validate a valid body', (done) => {
@@ -74,17 +79,6 @@ describe('middleware', () => {
     });
   });
 
-  it('should ignore GETs', (done) => {
-    middleware({
-      path: '/users',
-      method: 'GET',
-      baseUrl: '/users',
-      route: {
-        path: ''
-      }
-    }, null, done);
-  });
-
   it('should handle interpolated routes', (done) => {
     middleware({
       body: valid,
@@ -95,5 +89,31 @@ describe('middleware', () => {
         path: ':id'
       }
     }, null, done);
+  });
+});
+
+describe('mount', () => {
+  before(() => {
+    Middleware.mount(app);
+  });
+
+  it('should ignore GETs', () => {
+    return doubleApp.get('/users');
+  });
+
+  it('should validate a valid body', () => {
+    return doubleApp.post('/users', valid);
+  });
+
+  it('should reject an invalid body', async () => {
+    let thrown = false;
+
+    try {
+      await doubleApp.post('/users', invalid);
+    } catch (e) {
+      thrown = true;
+      assert(err.message === 'Missing required property: name');
+    }
+    assert(thrown);
   });
 });
