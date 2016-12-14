@@ -2,8 +2,6 @@ const tv4 = require('tv4');
 
 const SCHEMA_MISSING = new Error('Route has no schema');
 
-const METHODS = ['put', 'patch', 'post'];
-
 exports.middleware = (routeSchemas) => {
   return (req, res, next) => {
     if (!routeSchemas[req.method]) return next(SCHEMA_MISSING);
@@ -14,13 +12,28 @@ exports.middleware = (routeSchemas) => {
 
     if (!target) return next(SCHEMA_MISSING);
 
-    const valid = tv4.validate(req.body, target);
-    return valid ? next() : next(tv4.error);
+    return exports.single(target)(req, res, next);
   };
 };
 
-exports.mount = (app) => {
-  return METHODS.reduce((app, method) => {
-    return app[method](exports.middleware);
-  }, app);
+exports.single = (schema) => (req, res, next) =>
+    tv4.validate(req.body, schema) ? next() : next(tv4.error);
+
+exports.markValidated = (req, res, next) => {
+  req.schemaValidated = true;
+  next();
+};
+
+exports.mount = (app, routeSchemas, options) => {
+  Object.keys(routeSchemas).forEach(method => {
+    const v = routeSchemas[method];
+    Object.keys(v).forEach(route => {
+      const schema = v[route];
+      const mw = exports.single(schema);
+      app[method.toLowerCase()](route, mw);
+      if (options && options.markValidated) {
+        app[method.toLowerCase()](route, exports.markValidated);
+      };
+    });
+  });
 };

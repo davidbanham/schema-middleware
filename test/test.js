@@ -4,8 +4,14 @@ const refparser = require('json-schema-ref-parser');
 const Middleware = require('../index');
 const express = require('express');
 const doubleagent = require('doubleagent');
+const bodyParser = require('body-parser');
 
 const app = express();
+// FIXME this should be reloaded in a beforeEach to keep tests separate
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 const doubleApp = doubleagent(app);
 
 const valid = {
@@ -20,9 +26,9 @@ const invalid = {
 
 describe('middleware', () => {
   let middleware;
+  const routeSchemas = {};
 
   before(async () => {
-    const routeSchemas = {};
     const old = process.cwd();
     process.chdir('./test/schema');
     const dereffed = await refparser.dereference(schema);
@@ -90,30 +96,41 @@ describe('middleware', () => {
       }
     }, null, done);
   });
-});
 
-describe('mount', () => {
-  before(() => {
-    Middleware.mount(app);
+  describe('mount', () => {
+    before(() => {
+      Middleware.mount(app, routeSchemas);
+    });
+
+    it('should ignore GETs', () => {
+      return doubleApp.get('/users');
+    });
+
+    it('should validate a valid body', () => {
+      return doubleApp.post('/users', valid);
+    });
+
+    it('should reject an invalid body', async () => {
+      let thrown = false;
+
+      const res = await doubleApp.post('/users', invalid);
+
+      assert(res.status === 500);
+      assert(res.text.indexOf('ValidationError') > -1);
+    });
   });
 
-  it('should ignore GETs', () => {
-    return doubleApp.get('/users');
-  });
+  describe('markValidated', () => {
+    before(() => {
+      Middleware.mount(app, routeSchemas, {markValidated: true});
+    });
 
-  it('should validate a valid body', () => {
-    return doubleApp.post('/users', valid);
-  });
-
-  it('should reject an invalid body', async () => {
-    let thrown = false;
-
-    try {
-      await doubleApp.post('/users', invalid);
-    } catch (e) {
-      thrown = true;
-      assert(err.message === 'Missing required property: name');
-    }
-    assert(thrown);
+    it('should mark req a validated if asked', async () => {
+      app.post('/users', (req, res, next) => {
+        assert(req.schemaValidated);
+        res.send('ok');
+      });
+      await doubleApp.post('/users', valid);
+    });
   });
 });
