@@ -19,7 +19,7 @@ const invalid = {
 
 describe('middleware', () => {
   let middleware;
-  const routeSchemas = {};
+  let routeSchemas = {};
 
   before(async () => {
     const old = process.cwd();
@@ -27,11 +27,7 @@ describe('middleware', () => {
     const dereffed = await refparser.dereference(schema);
     process.chdir(old);
 
-    for (link of schema.links) {
-      if (!link.schema) continue;
-      routeSchemas[link.method] ? null : routeSchemas[link.method] = {};
-      routeSchemas[link.method][link.expressRoute || link.href] = link.schema;
-    };
+    routeSchemas = Middleware.parseLinks(schema);
 
     middleware = Middleware.createMiddleware(routeSchemas.POST['/users']);
   });

@@ -23,3 +23,13 @@ exports.mount = (app, routeSchemas, options) => {
     });
   });
 };
+
+exports.parseLinks = (schema) => {
+  const routeSchemas = {};
+  for (link of schema.links) {
+    if (!link.schema) continue;
+    routeSchemas[link.method] ? null : routeSchemas[link.method] = {};
+    routeSchemas[link.method][link.expressRoute || link.href] = link.schema;
+  };
+  return routeSchemas;
+};
