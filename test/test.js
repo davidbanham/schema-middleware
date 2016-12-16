@@ -27,7 +27,7 @@ describe('middleware', () => {
     const dereffed = await refparser.dereference(schema);
     process.chdir(old);
 
-    routeSchemas = Middleware.parseLinks(schema);
+    routeSchemas = Middleware.parseLinks({}, schema);
 
     middleware = Middleware.createMiddleware(routeSchemas.POST['/users']);
   });
@@ -98,6 +98,35 @@ describe('middleware', () => {
         });
         await doubleApp.post('/users', valid);
         assert(marked);
+      });
+    });
+  });
+
+  describe('parseLinks', () => {
+    it('should keep existing routes intact', () => {
+      const one = {
+        links: [{
+          method: 'PUT',
+          href: '/foo',
+          schema: 'hai'
+        }]
+      };
+
+      const two = {
+        links: [{
+          method: 'PUT',
+          href: '/bar',
+          schema: 'there'
+        }]
+      };
+
+      const merged = [one, two].reduce(Middleware.parseLinks, {});
+
+      assert.deepEqual(merged, {
+        PUT: {
+          '/foo': 'hai',
+          '/bar': 'there'
+        }
       });
     });
   });

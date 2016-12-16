@@ -24,8 +24,7 @@ exports.mount = (app, routeSchemas, options) => {
   });
 };
 
-exports.parseLinks = (schema) => {
-  const routeSchemas = {};
+exports.parseLinks = (routeSchemas, schema) => {
   for (link of schema.links) {
     if (!link.schema) continue;
     routeSchemas[link.method] ? null : routeSchemas[link.method] = {};
