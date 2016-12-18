@@ -32,3 +32,8 @@ exports.parseLinks = (routeSchemas, schema) => {
   };
   return routeSchemas;
 };
+
+exports.mountSchemas = (app, schemas, options) => {
+  const routeSchemas = schemas.reduce(exports.parseLinks, {});
+  exports.mount(app, routeSchemas, options);
+};

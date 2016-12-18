@@ -102,6 +102,43 @@ describe('middleware', () => {
     });
   });
 
+  describe('mountSchemas', () => {
+    let app;
+    let doubleApp;
+
+    beforeEach(() => {
+      app = express();
+
+      app.use(bodyParser.urlencoded({ extended: true }));
+      app.use(bodyParser.json());
+
+      doubleApp = doubleagent(app);
+    });
+
+    describe('no options', () => {
+      beforeEach(() => {
+        Middleware.mountSchemas(app, [schema], {});
+      });
+
+      it('should ignore GETs', () => {
+        return doubleApp.get('/users');
+      });
+
+      it('should validate a valid body', () => {
+        return doubleApp.post('/users', valid);
+      });
+
+      it('should reject an invalid body', async () => {
+        let thrown = false;
+
+        const res = await doubleApp.post('/users', invalid);
+
+        assert(res.status === 500);
+        assert(res.text.indexOf('ValidationError') > -1);
+      });
+    });
+  });
+
   describe('parseLinks', () => {
     it('should keep existing routes intact', () => {
       const one = {
