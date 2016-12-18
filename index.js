@@ -1,7 +1,5 @@
 const tv4 = require('tv4');
 
-const SCHEMA_MISSING = new Error('Route has no schema');
-
 exports.createMiddleware = (schema) => (req, res, next) =>
     tv4.validate(req.body, schema) ? next() : next(tv4.error);
 
