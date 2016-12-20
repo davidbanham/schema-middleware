@@ -6,7 +6,6 @@ const express = require('express');
 const doubleagent = require('doubleagent');
 const bodyParser = require('body-parser');
 
-
 const valid = {
   id: '3640c173-5821-4112-b61c-77c8091c8346',
   name: 'Jim',
@@ -15,6 +14,10 @@ const valid = {
 
 const invalid = {
   email: 'jim@example.com'
+};
+
+const assertValid = res => {
+  assert(res.statusCode === 404);
 };
 
 describe('middleware', () => {
@@ -67,11 +70,13 @@ describe('middleware', () => {
       });
 
       it('should ignore GETs', () => {
-        return doubleApp.get('/users');
+        return doubleApp.get('/users')
+        .then(assertValid);
       });
 
       it('should validate a valid body', () => {
-        return doubleApp.post('/users', valid);
+        return doubleApp.post('/users', valid)
+        .then(assertValid);
       });
 
       it('should reject an invalid body', async () => {
@@ -92,7 +97,6 @@ describe('middleware', () => {
       it('should mark req a validated if asked', async () => {
         let marked = false;
         app.post('/users', (req, res, next) => {
-          console.log('schemaValidated is', req.schemaValidated);
           marked = req.schemaValidated;
           res.send('ok');
         });
@@ -121,11 +125,13 @@ describe('middleware', () => {
       });
 
       it('should ignore GETs', () => {
-        return doubleApp.get('/users');
+        return doubleApp.get('/users')
+        .then(assertValid);
       });
 
       it('should validate a valid body', () => {
-        return doubleApp.post('/users', valid);
+        return doubleApp.post('/users', valid)
+        .then(assertValid);
       });
 
       it('should reject an invalid body', async () => {
