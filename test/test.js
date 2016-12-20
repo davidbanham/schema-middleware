@@ -69,8 +69,8 @@ describe('middleware', () => {
         Middleware.mount(app, routeSchemas);
       });
 
-      it('should ignore GETs', () => {
-        return doubleApp.get('/users')
+      it('should handle GETs', () => {
+        return doubleApp.get('/users?page=1')
         .then(assertValid);
       });
 
@@ -124,8 +124,8 @@ describe('middleware', () => {
         Middleware.mountSchemas(app, [schema], {});
       });
 
-      it('should ignore GETs', () => {
-        return doubleApp.get('/users')
+      it('should handle GETs', () => {
+        return doubleApp.get('/users?page=1')
         .then(assertValid);
       });
 

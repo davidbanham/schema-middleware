@@ -1,7 +1,9 @@
 const tv4 = require('tv4');
 
-exports.createMiddleware = (schema) => (req, res, next) =>
-    tv4.validate(req.body, schema) ? next() : next(tv4.error);
+exports.createMiddleware = (schema) => (req, res, next) => {
+  const payload = (req.method === 'GET') ? req.query : req.body;
+  return tv4.validate(payload, schema) ? next() : next(tv4.error);
+}
 
 exports.markValidated = (req, res, next) => {
   req.schemaValidated = true;

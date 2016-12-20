@@ -50,25 +50,16 @@
       "href": "/users",
       "method": "GET",
       "schema": {
+        "required": [
+          "page"
+        ],
         "type": "object",
         "properties": {
           "page": {
-            "type": "integer",
+            "type": "string",
             "description": "Current page of users",
-            "example": 1,
-            "default": 1
-          },
-          "per_page": {
-            "type": "integer",
-            "description": "How many users to retrieve at once",
-            "min": 1,
-            "max": 200,
-            "default": 20
-          },
-          "order": {
-            "enum": ["id", "created_at", "updated_at"],
-            "description": "Attribute to order the results by",
-            "example": "id"
+            "example": "1",
+            "default": "1"
           }
         }
       },
