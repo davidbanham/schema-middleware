@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/davidbanham/schema-middleware.git"
+    "url": "git+ssh://git@github.com/davidbanham/schema-middleware.git"
   },
   "keywords": [
     "json",
